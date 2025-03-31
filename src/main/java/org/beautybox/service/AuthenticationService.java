@@ -1,9 +1,9 @@
 package org.beautybox.service;
 
-import org.beautybox.response.ApiResponse;
+import org.beautybox.request.LoginRequest;
+import org.beautybox.response.TokenResponse;
 
 public interface AuthenticationService {
-    ApiResponse login(String username, String password);
-    ApiResponse logout();
-    String encryptPassword(String password);
+    TokenResponse login(LoginRequest loginRequest);
+    void logout(String token);
 }

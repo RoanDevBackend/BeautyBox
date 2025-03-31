@@ -9,8 +9,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
-import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.format.DateTimeParseException;
 import java.util.Objects;
@@ -19,39 +17,16 @@ import java.util.Objects;
 @Slf4j
 public class GlobalException {
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse> exception(Exception e){
-        log.error(e.getMessage());
-        return ResponseEntity.badRequest().body(ApiResponse.error("Lỗi kết nối"));
-    }
-
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse> exception(RuntimeException e){
         log.error(e.getMessage());
         return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
     }
 
-
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ApiResponse> exception(HttpRequestMethodNotSupportedException e){
         log.error(e.getMessage());
         return ResponseEntity.badRequest().body(ApiResponse.error("Phương thức '" + e.getMethod() + "' không được hỗ trợ cho truy vấn này"));
-    }
-
-    @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<ApiResponse> exception(NoHandlerFoundException e){
-        log.error(e.getMessage());
-        return ResponseEntity.badRequest().body(ApiResponse.error(404, "Không tồn tại đường dẫn này"));
-    }
-
-    /**
-     * Xử lí lỗi không quá 10MB dữ liệu đối với file
-     */
-
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<ApiResponse> handleMaxSizeException(MaxUploadSizeExceededException e) {
-        log.error(e.getMessage());
-        return ResponseEntity.badRequest().body(ApiResponse.error("Kích thước file không quá 10 MB"));
     }
 
     /**

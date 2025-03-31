@@ -8,8 +8,8 @@ import org.beautybox.entity.User;
 import org.beautybox.exception.BeautyBoxException;
 import org.beautybox.exception.ErrorDetail;
 import org.beautybox.mapper.UserMapper;
-import org.beautybox.repository.RoleRepo;
-import org.beautybox.repository.UserRepo;
+import org.beautybox.repository.RoleRepository;
+import org.beautybox.repository.UserRepository;
 import org.beautybox.request.UserRegisterRequest;
 import org.beautybox.service.UserService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,21 +23,21 @@ import org.springframework.stereotype.Service;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserServiceImpl implements UserService, UserDetailsService {
 
-    UserRepo userRepo;
-    RoleRepo roleRepo;
+    UserRepository userRepository;
+    RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
     UserMapper userMapper;
 
     @SneakyThrows
     @Override
     public boolean register(UserRegisterRequest registerRequest) {
-        if(userRepo.existsByEmail(registerRequest.getEmail())){
+        if(userRepository.existsByEmail(registerRequest.getEmail())){
             throw new BeautyBoxException(ErrorDetail.ERR_USER_EMAIL_EXISTED);
         }
         User user =  userMapper.fromRegisterRequest(registerRequest);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(roleRepo.findByName("ROLE_USER"));
-        userRepo.save(user);
+        user.setRole(roleRepository.findByName("ROLE_USER"));
+        userRepository.save(user);
         return true;
     }
 

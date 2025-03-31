@@ -2,8 +2,8 @@ package org.beautybox;
 
 import lombok.RequiredArgsConstructor;
 import org.beautybox.entity.Role;
-import org.beautybox.repository.RoleRepo;
-import org.beautybox.repository.UserRepo;
+import org.beautybox.repository.RoleRepository;
+import org.beautybox.repository.UserRepository;
 import org.beautybox.request.UserRegisterRequest;
 import org.beautybox.service.UserService;
 import org.springframework.boot.CommandLineRunner;
@@ -17,19 +17,19 @@ public class BeautyBoxApplication implements CommandLineRunner {
         SpringApplication.run(BeautyBoxApplication.class, args);
     }
 
-    final RoleRepo roleRepo;
-    final UserRepo userRepo;
+    final RoleRepository roleRepository;
+    final UserRepository userRepository;
     final UserService userService;
 
     @Override
-    public void run(String... args) throws Exception {
-        if(!roleRepo.existsByName("ROLE_ADMIN")) {
-            roleRepo.save(new Role("ROLE_ADMIN"));
+    public void run(String... args){
+        if(!roleRepository.existsByName("ROLE_ADMIN")) {
+            roleRepository.save(new Role("ROLE_ADMIN"));
         }
-        if(!roleRepo.existsByName("ROLE_USER")) {
-            roleRepo.save(new Role("ROLE_USER"));
+        if(!roleRepository.existsByName("ROLE_USER")) {
+            roleRepository.save(new Role("ROLE_USER"));
         }
-        if(!userRepo.existsByEmail("beautybox@gmail.com")) {
+        if(!userRepository.existsByEmail("beautybox@gmail.com")) {
             UserRegisterRequest registerRequest = new UserRegisterRequest();
             registerRequest.setEmail("beautybox@gmail.com");
             registerRequest.setName("BeautyBox");

@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum ErrorDetail {
     ERR_USER_EMAIL_EXISTED(400, "Email already exists")
+    , ERR_USER_UN_AUTHENTICATE(401, "Incorrect username or password")
     ;
 
     private final int code;
