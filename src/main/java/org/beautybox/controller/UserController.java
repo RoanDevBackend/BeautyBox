@@ -49,7 +49,7 @@ public class UserController {
     @Operation(summary = "Đăng xuất", security = {
             @SecurityRequirement(name = "bearerAuth")
     })
-    @PostMapping("/logout")
+    @PostMapping("/sign-out")
     public ApiResponse logout(@RequestParam String token) {
         authenticationService.logout(token);
         return ApiResponse.builder()

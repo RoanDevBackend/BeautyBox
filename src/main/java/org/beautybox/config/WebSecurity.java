@@ -28,7 +28,8 @@ public class WebSecurity {
                 .cors(httpSecurityCorsConfigurer -> corsFilter())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        t -> t.requestMatchers("/**").permitAll()
+                        t -> t.requestMatchers("/public-api/**").permitAll()
+                                .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter , UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
