@@ -6,6 +6,7 @@ import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.beautybox.entity.User;
 import org.beautybox.exception.BeautyBoxException;
+import org.beautybox.exception.ErrorDetail;
 import org.beautybox.mapper.UserMapper;
 import org.beautybox.repository.RoleRepo;
 import org.beautybox.repository.UserRepo;
@@ -31,7 +32,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public boolean register(UserRegisterRequest registerRequest) {
         if(userRepo.existsByEmail(registerRequest.getEmail())){
-            throw new BeautyBoxException("Email already in use");
+            throw new BeautyBoxException(ErrorDetail.ERR_USER_EMAIL_EXISTED);
         }
         User user =  userMapper.fromRegisterRequest(registerRequest);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
