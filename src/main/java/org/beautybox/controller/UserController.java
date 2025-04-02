@@ -2,6 +2,7 @@ package org.beautybox.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -12,9 +13,9 @@ import org.beautybox.response.ApiResponse;
 import org.beautybox.response.TokenResponse;
 import org.beautybox.service.AuthenticationService;
 import org.beautybox.service.UserService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -50,7 +51,8 @@ public class UserController {
             @SecurityRequirement(name = "bearerAuth")
     })
     @PostMapping("/sign-out")
-    public ApiResponse logout(@RequestParam String token) {
+    public ApiResponse logout(HttpServletRequest request) {
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION).substring(7);
         authenticationService.logout(token);
         return ApiResponse.builder()
                 .code(200)
