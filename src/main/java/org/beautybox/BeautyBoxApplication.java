@@ -2,6 +2,8 @@ package org.beautybox;
 
 import lombok.RequiredArgsConstructor;
 import org.beautybox.entity.Role;
+import org.beautybox.entity.User;
+import org.beautybox.mapper.UserMapper;
 import org.beautybox.repository.RoleRepository;
 import org.beautybox.repository.UserRepository;
 import org.beautybox.request.UserRegisterRequest;
@@ -20,6 +22,7 @@ public class BeautyBoxApplication implements CommandLineRunner {
     final RoleRepository roleRepository;
     final UserRepository userRepository;
     final UserService userService;
+    final UserMapper userMapper;
 
     @Override
     public void run(String... args){
@@ -36,9 +39,15 @@ public class BeautyBoxApplication implements CommandLineRunner {
             registerRequest.setPassword("Admin@1234");
             registerRequest.setGender("Undefined");
             registerRequest.setPhone("Undefined");
-            if(userService.register(registerRequest)){
-                System.out.println("Register admin account success! ");
-            }
+            User user = userMapper.fromRegisterRequest(registerRequest);
+            user.setRole(roleRepository.findByName("ROLE_ADMIN"));
+
+            userRepository.save(user);
+        }else{
+            User user = userRepository.findUserByEmail("beautybox@gmail.com");
+            user.setRole(roleRepository.findByName("ROLE_ADMIN"));
+
+            userRepository.save(user);
         }
     }
 }

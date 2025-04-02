@@ -22,6 +22,11 @@ public class WebSecurity {
 
     final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    final String[] listUnAuthenticate={
+            "/v3/api-docs/**"
+            , "/swagger-ui/**"
+            , "/swagger-ui.html"
+    };
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -29,6 +34,8 @@ public class WebSecurity {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         t -> t.requestMatchers("/public-api/**").permitAll()
+                                .requestMatchers(listUnAuthenticate).permitAll()
+                                .requestMatchers("/admin-api/**").hasAuthority("ROLE_ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter , UsernamePasswordAuthenticationFilter.class)

@@ -19,10 +19,10 @@ public class Product {
     String name;
     @Column(columnDefinition = "text")
     String description;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
             @JoinColumn(name = "category_id")
     Category category;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
             @JoinColumn(name = "brand_id")
     Brand brand;
 }
