@@ -7,6 +7,7 @@ public enum ErrorDetail {
     ERR_USER_EMAIL_EXISTED(400, "Email already exists")
     , ERR_USER_UN_AUTHENTICATE(401, "Incorrect username or password")
     , ERR_CATEGORY_EXISTED(400, "Category already exists")
+    , ERR_BRAND_EXISTED(400, "Brand already exists")
     ;
 
     private final int code;
