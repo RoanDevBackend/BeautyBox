@@ -21,6 +21,8 @@ public class UserRegisterRequest{
     String name;
     @NotBlank(message = "Password field cannot be left empty")
     String password;
+    @NotBlank(message = "Password confirm field cannot be left empty")
+    String passwordConfirm;
     @NotBlank(message = "Gender field cannot be left empty")
     String gender;
     @NotBlank(message = "Email field cannot be left empty")

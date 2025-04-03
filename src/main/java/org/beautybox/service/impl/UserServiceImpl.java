@@ -31,6 +31,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @SneakyThrows
     @Override
     public boolean register(UserRegisterRequest registerRequest) {
+        if(!registerRequest.getPassword().equals(registerRequest.getPasswordConfirm())){
+            throw new BeautyBoxException(ErrorDetail.ERR_PASSWORD_CONFIRM_INCORRECT);
+        }
         if(userRepository.existsByEmail(registerRequest.getEmail())){
             throw new BeautyBoxException(ErrorDetail.ERR_USER_EMAIL_EXISTED);
         }
