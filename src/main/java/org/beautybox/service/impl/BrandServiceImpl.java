@@ -29,12 +29,12 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
-    public boolean deleteBrand(String brandId) {
+    public String deleteBrand(String brandId) {
         Optional<Brand> brand = brandRepository.findById(brandId);
         if(brand.isPresent()) {
             brandRepository.delete(brand.get());
-            return true;
+            return "success";
         }
-        return false;
+        return "Brand does not exist";
     }
 }

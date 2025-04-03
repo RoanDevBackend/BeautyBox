@@ -29,11 +29,11 @@ public class BrandController {
     })
     @DeleteMapping("/admin-api/brand/{brandId}")
     public ApiResponse deleteCategory(@PathVariable String brandId) {
-        boolean response = brandService.deleteBrand(brandId);
-        if(response) {
+        String response = brandService.deleteBrand(brandId);
+        if(response.equals("success")) {
             return ApiResponse.success("Delete success");
         }else{
-            return ApiResponse.error("Delete failed");
+            return ApiResponse.error(response);
         }
     }
 }

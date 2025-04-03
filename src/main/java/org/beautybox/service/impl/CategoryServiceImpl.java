@@ -10,6 +10,8 @@ import org.beautybox.request.CreateCategoryRequest;
 import org.beautybox.service.CategoryService;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
@@ -28,7 +30,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void deleteCategory(String categoryId) {
-        categoryRepository.deleteById(categoryId);
+    public String deleteCategory(String categoryId) {
+        Optional<Category> category = categoryRepository.findById(categoryId);
+        if(category.isPresent()) {
+            categoryRepository.delete(category.get());
+            return "success";
+        }return "Category does not exist";
     }
 }

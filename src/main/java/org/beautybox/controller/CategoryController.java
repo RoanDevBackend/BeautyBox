@@ -1,5 +1,7 @@
 package org.beautybox.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.beautybox.request.CreateCategoryRequest;
@@ -14,15 +16,24 @@ public class CategoryController {
     final CategoryService categoryService;
 
     @PostMapping("/admin-api/category")
+    @Operation(summary = "Thêm thể loại mới", security = {
+            @SecurityRequirement(name = "bearerAuth")
+    })
     public ApiResponse createCategory(@RequestBody @Valid CreateCategoryRequest request) {
         categoryService.addCategory(request);
         return ApiResponse.success("Create success");
     }
 
     @DeleteMapping("/admin-api/category/{categoryId}")
+    @Operation(summary = "Xoá thể loại kèm theo sản phẩm", security = {
+            @SecurityRequirement(name = "bearerAuth")
+    })
     public ApiResponse deleteCategory(@PathVariable String categoryId) {
-        categoryService.deleteCategory(categoryId);
-        return ApiResponse.success("Delete success");
+        String response = categoryService.deleteCategory(categoryId);
+        if(response.equals("success")) {
+            return ApiResponse.success("Delete success");
+        }
+        return ApiResponse.error(response);
     }
 
 }

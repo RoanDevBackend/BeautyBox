@@ -4,5 +4,5 @@ import org.beautybox.request.CreateCategoryRequest;
 
 public interface CategoryService {
     void addCategory(CreateCategoryRequest request);
-    void deleteCategory(String categoryId);
+    String deleteCategory(String categoryId);
 }
