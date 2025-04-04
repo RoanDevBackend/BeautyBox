@@ -9,6 +9,9 @@ public enum ErrorDetail {
     , ERR_PASSWORD_CONFIRM_INCORRECT(400, "Password confirmation incorrect")
     , ERR_CATEGORY_EXISTED(400, "Category already exists")
     , ERR_BRAND_EXISTED(400, "Brand already exists")
+    , ERR_BRAND_NOT_EXISTED(400, "Brand does not exists")
+    , ERR_CATEGORY_NOT_EXISTED(400, "Category does not exists")
+    , ERR_WHILE_UPLOAD(400, "Error uploading image")
     ;
 
     private final int code;
