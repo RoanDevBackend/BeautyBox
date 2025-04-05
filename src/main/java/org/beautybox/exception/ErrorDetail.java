@@ -12,6 +12,7 @@ public enum ErrorDetail {
     , ERR_BRAND_NOT_EXISTED(400, "Brand does not exists")
     , ERR_CATEGORY_NOT_EXISTED(400, "Category does not exists")
     , ERR_WHILE_UPLOAD(400, "Error uploading image")
+    , ERR_PRODUCT_NOT_EXISTED(400, "Product does not exist")
     ;
 
     private final int code;
