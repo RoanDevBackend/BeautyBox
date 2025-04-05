@@ -11,12 +11,11 @@ import org.beautybox.request.LoginRequest;
 import org.beautybox.request.UserRegisterRequest;
 import org.beautybox.response.ApiResponse;
 import org.beautybox.response.TokenResponse;
+import org.beautybox.response.UserResponse;
 import org.beautybox.service.AuthenticationService;
 import org.beautybox.service.UserService;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -57,6 +56,21 @@ public class UserController {
         return ApiResponse.builder()
                 .code(200)
                 .message("Logout success")
+                .build();
+    }
+
+
+    @Operation(summary = "Lấy thông tin tài khoản bẳng token", security = {
+            @SecurityRequirement(name = "bearerAuth")
+    })
+    @GetMapping(value = "/user")
+    public ApiResponse getUser(HttpServletRequest request) {
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION).substring(7);
+        System.out.println(token);
+        UserResponse userResponse = userService.getUserByToken(token);
+        return ApiResponse.builder()
+                .code(200)
+                .data(userResponse)
                 .build();
     }
 }

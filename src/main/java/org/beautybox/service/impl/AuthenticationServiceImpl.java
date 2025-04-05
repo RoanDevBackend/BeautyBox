@@ -1,5 +1,6 @@
 package org.beautybox.service.impl;
 
+import io.jsonwebtoken.Claims;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -18,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -63,7 +65,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void logout(String token) {
-        redisRepository.set(token, true);
+        Date date = jwtService.extractClaim(token, Claims::getExpiration);
+        redisRepository.set(token, jwtService.extractUsername(token));
+        redisRepository.setTimeToLive(token, date.getTime() - new Date().getTime());
+        System.out.println("Token date: " + date);
     }
-
 }

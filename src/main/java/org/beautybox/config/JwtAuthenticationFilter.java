@@ -53,6 +53,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
         Object a = redisRepository.get(jwt);
         if(a != null) {
+            response.setContentType("application/json; charset=UTF-8");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            ApiResponse apiResponse= ApiResponse.error(401, "Phiên đã hết hạn, vui lòng đăng nhập lại !");
+            String content= objectMapper.writeValueAsString(apiResponse);
+            response.getWriter().write(content);
             return;
         }
         try {

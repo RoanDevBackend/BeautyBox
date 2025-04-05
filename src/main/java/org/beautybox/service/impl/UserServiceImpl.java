@@ -11,12 +11,16 @@ import org.beautybox.mapper.UserMapper;
 import org.beautybox.repository.RoleRepository;
 import org.beautybox.repository.UserRepository;
 import org.beautybox.request.UserRegisterRequest;
+import org.beautybox.response.UserResponse;
+import org.beautybox.service.JwtService;
 import org.beautybox.service.UserService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +29,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     UserRepository userRepository;
     RoleRepository roleRepository;
+    JwtService jwtService;
     PasswordEncoder passwordEncoder;
     UserMapper userMapper;
 
@@ -47,5 +52,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return null;
+    }
+
+    @Override
+    public UserResponse getUserByToken(String token) {
+        String username = jwtService.extractUsername(token);
+        User user = userRepository.findUserByEmail(username);
+        return userMapper.toResponse(user);
     }
 }

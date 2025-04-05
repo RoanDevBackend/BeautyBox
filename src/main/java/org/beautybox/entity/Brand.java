@@ -17,4 +17,8 @@ public class Brand {
     String id;
     @Column(unique = true, nullable = false)
     String name;
+    @Column(nullable = false, length = 100)
+    String urlImage;
+    @Column(columnDefinition = "text")
+    String description;
 }
