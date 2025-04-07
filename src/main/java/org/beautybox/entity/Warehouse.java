@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Warehouse {
+public class Warehouse extends BaseEntity {
     @Id
         @GeneratedValue(strategy = GenerationType.UUID)
             @Column(length = 36)

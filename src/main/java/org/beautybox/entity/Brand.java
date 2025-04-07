@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Brand {
+public class Brand extends BaseEntity {
     @Id
         @GeneratedValue(strategy = GenerationType.UUID)
             @Column(length = 36)

@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductDetail {
+public class ProductDetail extends BaseEntity {
     @Id
         @GeneratedValue(strategy = GenerationType.UUID)
             @Column(length = 36)
