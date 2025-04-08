@@ -37,7 +37,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Lấy ra danh sách sản phẩm")
-    @GetMapping("/public-api")
+    @GetMapping("/public-api/product/search")
     public ApiResponse filterProduct(@RequestParam(required = false) String value,
                                      @RequestParam(required = false, defaultValue = "0 ") long minPrice,
                                      @RequestParam(required = false, defaultValue = "999999999") long maxPrice,
@@ -49,7 +49,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Lấy danh sách sản phẩm theo thể loại")
-    @GetMapping("/public-api/category")
+    @GetMapping("/public-api/product/category")
     public ApiResponse getProductByCategory(@RequestParam String categoryId,
                                           @RequestParam(required = false, defaultValue = "1") int pageIndex,
                                           @RequestParam(required = false, defaultValue = "40") int pageSize,
@@ -59,7 +59,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Lấy danh sách sản phẩm theo thương hiệu")
-    @GetMapping("/public-api/brand")
+    @GetMapping("/public-api/product/brand")
     public ApiResponse getProductByBrand(@RequestParam String brandId,
                                           @RequestParam(required = false, defaultValue = "1") int pageIndex,
                                           @RequestParam(required = false, defaultValue = "40") int pageSize,

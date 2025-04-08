@@ -36,4 +36,8 @@ public class CategoryController {
         return ApiResponse.error(response);
     }
 
+    @GetMapping("/public-api/category")
+    public ApiResponse getCategory() {
+        return ApiResponse.success("Get all categories", categoryService.getAllCategories());
+    }
 }

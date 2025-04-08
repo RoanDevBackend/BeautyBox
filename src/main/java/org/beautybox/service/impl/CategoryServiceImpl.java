@@ -5,11 +5,14 @@ import lombok.SneakyThrows;
 import org.beautybox.entity.Category;
 import org.beautybox.exception.BeautyBoxException;
 import org.beautybox.exception.ErrorDetail;
+import org.beautybox.mapper.CategoryMapper;
 import org.beautybox.repository.CategoryRepository;
 import org.beautybox.request.CreateCategoryRequest;
+import org.beautybox.response.CategoryResponse;
 import org.beautybox.service.CategoryService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,6 +20,7 @@ import java.util.Optional;
 public class CategoryServiceImpl implements CategoryService {
 
     final CategoryRepository categoryRepository;
+    final CategoryMapper categoryMapper;
 
     @SneakyThrows
     @Override
@@ -36,5 +40,10 @@ public class CategoryServiceImpl implements CategoryService {
             categoryRepository.delete(category.get());
             return "success";
         }return "Category does not exist";
+    }
+
+    @Override
+    public List<CategoryResponse> getAllCategories() {
+        return categoryRepository.findAll().stream().map(categoryMapper::toResponse).toList();
     }
 }
