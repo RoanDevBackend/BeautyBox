@@ -10,12 +10,21 @@ import org.beautybox.mapper.ProductMapper;
 import org.beautybox.repository.*;
 import org.beautybox.request.CreateProductDetailRequest;
 import org.beautybox.request.CreateProductRequest;
+import org.beautybox.response.PageResponse;
+import org.beautybox.response.ProductDetailResponse;
+import org.beautybox.response.ProductResponse;
 import org.beautybox.service.ProductService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -76,5 +85,41 @@ public class ProductServiceImpl implements ProductService {
         productDetail.setImageUrl(imageUrl);
         productDetail.setProduct(product);
         productDetailRepository.save(productDetail);
+    }
+
+    @Override
+    public PageResponse<?> filterProduct(String value, int minPrice, int maxPrice, long pageIndex, long pageSize, String orderBy, String direction) {
+        return null;
+    }
+
+    @Override
+    public PageResponse<?> getByCategory(String categoryId, int pageIndex, int pageSize, String orderBy, String direction) {
+        if(orderBy == null){
+            orderBy = "createdAt";
+        }
+        if(direction == null){
+            direction = "desc";
+        }
+        Pageable pageable = PageRequest.of(pageIndex - 1, pageSize, direction.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, orderBy);
+        Page<Product> products = productRepository.getByCategory(categoryId, pageable);
+
+        List<ProductResponse> productResponses = new ArrayList<>();
+
+        for(Product product : products.getContent()){
+            ProductResponse item = productMapper.toProductResponse(product);
+            List<ProductDetail> productDetails = productDetailRepository.findByProductId(product.getId());
+            item.setDetails(productDetails.stream().map(productMapper::toProductDetailResponse).toList());
+            productResponses.add(item);
+        }
+
+
+        return PageResponse.<ProductResponse>builder()
+                .pageSize(products.getSize())
+                .pageIndex(products.getNumber())
+                .totalElements(products.getTotalElements())
+                .totalPages(products.getTotalPages())
+                .content(productResponses)
+                .sortBy(new PageResponse.SortBy(orderBy, direction))
+                .build();
     }
 }

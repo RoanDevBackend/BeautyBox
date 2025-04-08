@@ -35,9 +35,20 @@ public class GlobalException {
     @ExceptionHandler(TypeMismatchException.class)
     public ResponseEntity<ApiResponse> exception(TypeMismatchException e){
         log.error(e.getMessage());
-        return ResponseEntity.badRequest().body(ApiResponse.error("Tham số không đúng định dạng"));
-    }
+        String field = Objects.requireNonNull(e.getPropertyName());
+        int index = -1;
+        for(int x = 0 ; x < field.length() ; x++){
+            if(field.charAt(x) >= 'A' && field.charAt(x) <= 'Z'){
+                index = x;
+                break;
+            }
+        }
+        String s1 = field.substring(0, index);
+        String s2 = field.substring(index);
 
+        field = s1.substring(0, 1).toUpperCase() + s1.substring(1) + " " + s2.substring(0, 1).toLowerCase() + s2.substring(1);
+        return ResponseEntity.badRequest().body(ApiResponse.error(field + " is not in correct format"));
+    }
     /**
      * Xử lí lỗi, chuyển đổi kiểu dữ liệu thời gian
      */

@@ -21,6 +21,14 @@ public class ApiResponse {
                 .build();
     }
 
+    public static ApiResponse success(String message, Object data){
+        return ApiResponse.builder()
+                .code(200)
+                .message(message)
+                .data(data)
+                .build();
+    }
+
     public static ApiResponse error(String message) {
         return ApiResponse.builder()
                 .code(400)

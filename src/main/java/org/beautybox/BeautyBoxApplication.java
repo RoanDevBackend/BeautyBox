@@ -11,6 +11,7 @@ import org.beautybox.service.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
 @RequiredArgsConstructor
@@ -21,7 +22,7 @@ public class BeautyBoxApplication implements CommandLineRunner {
 
     final RoleRepository roleRepository;
     final UserRepository userRepository;
-    final UserService userService;
+    final PasswordEncoder passwordEncoder;
     final UserMapper userMapper;
 
     @Override
@@ -36,7 +37,8 @@ public class BeautyBoxApplication implements CommandLineRunner {
             UserRegisterRequest registerRequest = new UserRegisterRequest();
             registerRequest.setEmail("beautybox@gmail.com");
             registerRequest.setName("BeautyBox");
-            registerRequest.setPassword("Admin@1234");
+            String password = passwordEncoder.encode("Admin@1234");
+            registerRequest.setPassword(password);
             registerRequest.setGender("Undefined");
             registerRequest.setPhone("Undefined");
             User user = userMapper.fromRegisterRequest(registerRequest);
@@ -46,7 +48,6 @@ public class BeautyBoxApplication implements CommandLineRunner {
         }else{
             User user = userRepository.findUserByEmail("beautybox@gmail.com");
             user.setRole(roleRepository.findByName("ROLE_ADMIN"));
-
             userRepository.save(user);
         }
     }

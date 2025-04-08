@@ -4,14 +4,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.beautybox.request.CreateProductDetailRequest;
 import org.beautybox.request.CreateProductRequest;
 import org.beautybox.response.ApiResponse;
 import org.beautybox.service.ProductService;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class ProductController {
@@ -34,5 +34,27 @@ public class ProductController {
     public ApiResponse createProductDetail(@ModelAttribute @Valid CreateProductDetailRequest request){
         productService.addProductDetail(request);
         return ApiResponse.success("Created product detail success");
+    }
+
+    @Operation(summary = "Lấy ra danh sách sản phẩm")
+    @GetMapping("/public-api")
+    public ApiResponse filterProduct(@RequestParam(required = false) String value,
+                                     @RequestParam(required = false, defaultValue = "0 ") long minPrice,
+                                     @RequestParam(required = false, defaultValue = "999999999") long maxPrice,
+                                     @RequestParam(required = false, defaultValue = "1") long pageIndex,
+                                     @RequestParam(required = false, defaultValue = "40") long pageSize,
+                                     @RequestParam(required = false, defaultValue = "createdAt") String orderBy,
+                                     @RequestParam(required = false, defaultValue = "ASC") String sortDirection) {
+        return null;
+    }
+
+    @Operation(summary = "Lấy danh sách sản phẩm theo thể loại")
+    @GetMapping("/public-api/category")
+    public ApiResponse getProductCategory(@RequestParam String categoryId,
+                                          @RequestParam(required = false, defaultValue = "1") int pageIndex,
+                                          @RequestParam(required = false, defaultValue = "40") int pageSize,
+                                          @RequestParam(required = false, defaultValue = "createdAt") String orderBy,
+                                          @RequestParam(required = false, defaultValue = "asc") String sortDirection) {
+        return ApiResponse.success("Success", productService.getByCategory(categoryId, pageIndex, pageSize, orderBy, sortDirection));
     }
 }
