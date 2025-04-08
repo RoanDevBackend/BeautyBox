@@ -18,4 +18,8 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     @Query("from Product p " +
             "where p.category.id = :category ")
     Page<Product> getByCategory(String category, Pageable pageable);
+
+    @Query("from Product p " +
+            "where p.brand.id = :brand ")
+    Page<Product> getByBrand(String brand, Pageable pageable);
 }

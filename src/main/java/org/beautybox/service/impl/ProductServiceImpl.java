@@ -11,7 +11,6 @@ import org.beautybox.repository.*;
 import org.beautybox.request.CreateProductDetailRequest;
 import org.beautybox.request.CreateProductRequest;
 import org.beautybox.response.PageResponse;
-import org.beautybox.response.ProductDetailResponse;
 import org.beautybox.response.ProductResponse;
 import org.beautybox.service.ProductService;
 import org.springframework.data.domain.Page;
@@ -23,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -94,25 +91,36 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public PageResponse<?> getByCategory(String categoryId, int pageIndex, int pageSize, String orderBy, String direction) {
+        Pageable pageable = this.getPageable(pageIndex, pageSize, orderBy, direction);
+        Page<Product> products = productRepository.getByCategory(categoryId, pageable);
+        return this.convertResponse(products, orderBy, direction);
+    }
+
+    @Override
+    public PageResponse<?> getByBrand(String brandId, int pageIndex, int pageSize, String orderBy, String direction) {
+        Pageable pageable = this.getPageable(pageIndex, pageSize, orderBy, direction);
+        Page<Product> products = productRepository.getByBrand(brandId, pageable);
+        return this.convertResponse(products, orderBy, direction);
+    }
+
+    private Pageable getPageable(int pageIndex, int pageSize, String orderBy, String direction) {
         if(orderBy == null){
             orderBy = "createdAt";
         }
         if(direction == null){
             direction = "desc";
         }
-        Pageable pageable = PageRequest.of(pageIndex - 1, pageSize, direction.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, orderBy);
-        Page<Product> products = productRepository.getByCategory(categoryId, pageable);
+        return PageRequest.of(pageIndex - 1, pageSize, direction.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, orderBy);
+    }
 
+    private PageResponse<ProductResponse> convertResponse(Page<Product> products, String orderBy, String direction) {
         List<ProductResponse> productResponses = new ArrayList<>();
-
         for(Product product : products.getContent()){
             ProductResponse item = productMapper.toProductResponse(product);
             List<ProductDetail> productDetails = productDetailRepository.findByProductId(product.getId());
             item.setDetails(productDetails.stream().map(productMapper::toProductDetailResponse).toList());
             productResponses.add(item);
         }
-
-
         return PageResponse.<ProductResponse>builder()
                 .pageSize(products.getSize())
                 .pageIndex(products.getNumber())

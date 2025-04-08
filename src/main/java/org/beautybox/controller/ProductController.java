@@ -50,11 +50,21 @@ public class ProductController {
 
     @Operation(summary = "Lấy danh sách sản phẩm theo thể loại")
     @GetMapping("/public-api/category")
-    public ApiResponse getProductCategory(@RequestParam String categoryId,
+    public ApiResponse getProductByCategory(@RequestParam String categoryId,
                                           @RequestParam(required = false, defaultValue = "1") int pageIndex,
                                           @RequestParam(required = false, defaultValue = "40") int pageSize,
                                           @RequestParam(required = false, defaultValue = "createdAt") String orderBy,
                                           @RequestParam(required = false, defaultValue = "asc") String sortDirection) {
-        return ApiResponse.success("Success", productService.getByCategory(categoryId, pageIndex, pageSize, orderBy, sortDirection));
+        return ApiResponse.success("Search by category success", productService.getByCategory(categoryId, pageIndex, pageSize, orderBy, sortDirection));
+    }
+
+    @Operation(summary = "Lấy danh sách sản phẩm theo thương hiệu")
+    @GetMapping("/public-api/brand")
+    public ApiResponse getProductByBrand(@RequestParam String brandId,
+                                          @RequestParam(required = false, defaultValue = "1") int pageIndex,
+                                          @RequestParam(required = false, defaultValue = "40") int pageSize,
+                                          @RequestParam(required = false, defaultValue = "createdAt") String orderBy,
+                                          @RequestParam(required = false, defaultValue = "asc") String sortDirection) {
+        return ApiResponse.success("Search by brand success", productService.getByBrand(brandId, pageIndex, pageSize, orderBy, sortDirection));
     }
 }
