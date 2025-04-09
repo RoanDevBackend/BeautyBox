@@ -27,4 +27,9 @@ public interface ProductRepository extends JpaRepository<Product, String> {
             "from Product p " +
             "where p.category.id= :category ")
     int countByCategory(String category);
+
+    @Query("select count(*) " +
+            "from Product p " +
+            "where p.brand.id = :brand")
+    int countByBrand(String brand);
 }

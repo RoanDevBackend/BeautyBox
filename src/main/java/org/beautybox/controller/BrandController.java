@@ -19,7 +19,7 @@ public class BrandController {
             @SecurityRequirement(name = "bearerAuth")
     })
     @PostMapping("/admin-api/brand")
-    public ApiResponse createCategory(@RequestBody @Valid CreateBrandRequest request) {
+    public ApiResponse createCategory(@ModelAttribute @Valid CreateBrandRequest request) {
         brandService.addBrand(request);
         return ApiResponse.success("Create success");
     }
@@ -35,5 +35,10 @@ public class BrandController {
         }else{
             return ApiResponse.error(response);
         }
+    }
+
+    @GetMapping("/public-api/brand")
+    public ApiResponse getAllBrands() {
+        return ApiResponse.success("Get all brand success", brandService.getAllBrands());
     }
 }
