@@ -12,3 +12,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        search:
+          backend:
+            hosts: ${elastic.hosts}
+            username: ${elastic.username}
+            password: ${elastic.password}
