@@ -17,3 +17,7 @@ spring:
             hosts: ${elastic.hosts}
             username: ${elastic.username}
             password: ${elastic.password}
+            analysis:
+              configurer: org.beautybox.config.ElasticsearchAnalysisConfig
+          schema_management:
+            strategy: create-or-update

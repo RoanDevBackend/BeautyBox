@@ -4,10 +4,11 @@ import org.beautybox.request.CreateProductDetailRequest;
 import org.beautybox.request.CreateProductRequest;
 import org.beautybox.response.PageResponse;
 
+import java.util.List;
+
 public interface ProductService {
     void add(CreateProductRequest productRequest);
     void addProductDetail(CreateProductDetailRequest productDetailRequest);
-    PageResponse<?> filterProduct(String value, int minPrice, int maxPrice, long pageIndex, long pageSize, String orderBy, String direction);
-    PageResponse<?> getByCategory(String categoryId, int pageIndex, int pageSize, String orderBy, String direction);
-    PageResponse<?> getByBrand(String brandId, int pageIndex, int pageSize, String orderBy, String direction);
+    PageResponse<?> filterProduct(String value, String category, String brand, long minPrice, long maxPrice, int pageIndex, int pageSize, String orderBy, String direction);
+    List<String> suggestNameSearch(String value);
 }

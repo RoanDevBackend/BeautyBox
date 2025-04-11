@@ -1,6 +1,7 @@
 package org.beautybox.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -22,5 +23,6 @@ public class CreateProductRequest {
     String categoryId;
     @NotBlank(message = "Brand field cannot be left empty")
     String brandId;
+    @NotNull(message = "Image filed cannot be null")
     List<MultipartFile> images;
 }

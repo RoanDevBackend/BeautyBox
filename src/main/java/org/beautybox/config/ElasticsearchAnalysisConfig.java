@@ -11,18 +11,11 @@ public class ElasticsearchAnalysisConfig implements ElasticsearchAnalysisConfigu
         context.analyzer("vietnameseAnalyzer")
                 .custom()
                 .tokenizer("standard")
-                .tokenFilters("lowercase", "asciifolding");
-
-        context.analyzer( "english" ).custom()
-                .tokenizer( "standard" )
-                .tokenFilters( "lowercase", "snowball_english", "asciifolding" );
-
-        context.tokenFilter( "snowball_english" )
-                .type( "snowball" )
-                .param( "language", "English" );
-
-        context.analyzer( "name" ).custom()
-                .tokenizer( "standard" )
-                .tokenFilters( "lowercase", "asciifolding" );
+                .tokenFilters("lowercase", "asciifolding", "vietnamese_stop");
+        context.tokenFilter("vietnamese_stop")
+                .type("stop")
+                .param("stopwords",
+                        "và", "là", "của", "cho", "một", "các", "đã", "này", "những", "tôi", "bạn"
+                );
     }
 }

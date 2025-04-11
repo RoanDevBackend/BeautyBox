@@ -1,18 +1,21 @@
 package org.beautybox;
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.beautybox.entity.Role;
 import org.beautybox.entity.User;
 import org.beautybox.mapper.UserMapper;
 import org.beautybox.repository.RoleRepository;
 import org.beautybox.repository.UserRepository;
 import org.beautybox.request.UserRegisterRequest;
-import org.beautybox.service.UserService;
+import org.hibernate.search.mapper.orm.Search;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootApplication(exclude = {ElasticsearchRestClientAutoConfiguration.class})
 @RequiredArgsConstructor
@@ -24,8 +27,11 @@ public class BeautyBoxApplication implements CommandLineRunner {
     final RoleRepository roleRepository;
     final UserRepository userRepository;
     final PasswordEncoder passwordEncoder;
+    final EntityManager entityManager;
     final UserMapper userMapper;
 
+    @SneakyThrows
+    @Transactional
     @Override
     public void run(String... args){
         if(!roleRepository.existsByName("ROLE_ADMIN")) {
@@ -51,5 +57,8 @@ public class BeautyBoxApplication implements CommandLineRunner {
             user.setRole(roleRepository.findByName("ROLE_ADMIN"));
             userRepository.save(user);
         }
+        Search.session(entityManager)
+                .massIndexer()
+                .startAndWait();
     }
 }

@@ -1,6 +1,7 @@
 package org.beautybox.service.impl;
 
 import com.cloudinary.Cloudinary;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.beautybox.entity.*;
@@ -13,14 +14,14 @@ import org.beautybox.request.CreateProductRequest;
 import org.beautybox.response.PageResponse;
 import org.beautybox.response.ProductResponse;
 import org.beautybox.service.ProductService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -33,12 +34,13 @@ public class ProductServiceImpl implements ProductService {
     final BrandRepository brandRepository;
     final ImageRepository imageRepository;
     final ProductDetailRepository productDetailRepository;
+    final EntityManager entityManager;
     private final ProductMapper productMapper;
 
-    @SneakyThrows
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void add(CreateProductRequest productRequest) {
+    @SneakyThrows
+    public void add(CreateProductRequest productRequest){
         Brand brand = brandRepository.findById(productRequest.getBrandId()).orElseThrow(
                 () -> new BeautyBoxException(ErrorDetail.ERR_BRAND_NOT_EXISTED)
         );
@@ -53,6 +55,7 @@ public class ProductServiceImpl implements ProductService {
         product.setBrand(brand);
         product.setCategory(category);
         productRepository.save(product);
+        productRepository.flush();
         for(String imageUrl : imageUrls){
             Image image = new Image();
             image.setUrl(imageUrl);
@@ -85,49 +88,55 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public PageResponse<?> filterProduct(String value, int minPrice, int maxPrice, long pageIndex, long pageSize, String orderBy, String direction) {
-        return null;
-    }
+    public PageResponse<?> filterProduct(String value, String category, String brand, long minPrice, long maxPrice, int pageIndex, int pageSize, String orderBy, String direction) {
+        SearchSession searchSession = Search.session(entityManager);
+        SearchResult<Product> searchResult = searchSession.search(Product.class)
+                .where(t -> {
+                            var bool = t.bool();
 
-    @Override
-    public PageResponse<?> getByCategory(String categoryId, int pageIndex, int pageSize, String orderBy, String direction) {
-        Pageable pageable = this.getPageable(pageIndex, pageSize, orderBy, direction);
-        Page<Product> products = productRepository.getByCategory(categoryId, pageable);
-        return this.convertResponse(products, orderBy, direction);
-    }
+                            bool.must(
+                                    t.bool()
+                                            .should(t.not(t.exists().field("productDetails")))
+                                            .should(t.range().field("productDetails.price").between(minPrice, maxPrice))
+                            );
+                            if(value != null && !value.isBlank()){
+                                bool.must(t.match().fields("name", "description", "productDetails.name", "productDetails.description").matching(value).fuzzy());
+                            }
+                            if(category != null && !category.isBlank()){
+                                bool.must(t.match().field("category.id").matching(category));
+                            }
+                            if(brand != null && !brand.isBlank()){
+                                bool.must(t.match().field("brand.id").matching(brand));
+                            }
+                            return bool;
+                        }
+                ).sort(t -> {
+                    var sort = t.composite();
+                    sort.add(direction.equals("asc") ? t.field(orderBy).asc() : t.field(orderBy).desc());
+                    return sort;
+                }).fetch(pageIndex-1, pageSize);
 
-    @Override
-    public PageResponse<?> getByBrand(String brandId, int pageIndex, int pageSize, String orderBy, String direction) {
-        Pageable pageable = this.getPageable(pageIndex, pageSize, orderBy, direction);
-        Page<Product> products = productRepository.getByBrand(brandId, pageable);
-        return this.convertResponse(products, orderBy, direction);
-    }
-
-    private Pageable getPageable(int pageIndex, int pageSize, String orderBy, String direction) {
-        if(orderBy == null){
-            orderBy = "createdAt";
-        }
-        if(direction == null){
-            direction = "desc";
-        }
-        return PageRequest.of(pageIndex - 1, pageSize, direction.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, orderBy);
-    }
-
-    private PageResponse<ProductResponse> convertResponse(Page<Product> products, String orderBy, String direction) {
-        List<ProductResponse> productResponses = new ArrayList<>();
-        for(Product product : products.getContent()){
-            ProductResponse item = productMapper.toProductResponse(product);
-            List<ProductDetail> productDetails = productDetailRepository.findByProductId(product.getId());
-            item.setDetails(productDetails.stream().map(productMapper::toProductDetailResponse).toList());
-            productResponses.add(item);
-        }
+        List<Product> products = searchResult.hits();
         return PageResponse.<ProductResponse>builder()
-                .pageSize(products.getSize())
-                .pageIndex(products.getNumber())
-                .totalElements(products.getTotalElements())
-                .totalPages(products.getTotalPages())
-                .content(productResponses)
+                .pageIndex(pageIndex)
+                .pageSize(pageSize)
                 .sortBy(new PageResponse.SortBy(orderBy, direction))
+                .content(products.stream().map(productMapper::toProductResponse).toList())
+                .totalElements(searchResult.total().hitCount())
+                .totalPages((searchResult.total().hitCount() + pageSize - 1) / pageSize)
                 .build();
+    }
+
+    @Override
+    public List<String> suggestNameSearch(String value) {
+        SearchResult<?> searchResult = Search.session(entityManager)
+                .search(Product.class)
+                .select(
+                        t-> t.highlight("name")
+                )
+                .where(t -> t.phrase().field("name").matching(value).slop(2))
+                .highlighter(t-> t.plain().tag("<b>", "</b>"))
+                .fetchAll();
+        return searchResult.hits().stream().map(t-> t.toString().substring(1, t.toString().length() - 1)).toList();
     }
 }
